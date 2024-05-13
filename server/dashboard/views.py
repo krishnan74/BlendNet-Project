@@ -43,6 +43,25 @@ def addWatchList(request):
         return JsonResponse({"error": str(e)})
     
 
+def getWatchList(request):
+    try:
+        current_user_id = request.GET.get('userid')
+        
+        database = client.get_database("user_db")
+        users = database.get_collection("users")
+
+        current_user = users.find_one({"_id" : ObjectId(current_user_id)})
+
+        if current_user:
+            watch_list = current_user.get('watch_list', [])
+            return JsonResponse({"watch_list": watch_list})
+
+        return JsonResponse({"error": "User not found"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
+    
+
 # Create your views here.
 def getAllStocks(request):
     #accept json
