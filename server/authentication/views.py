@@ -51,7 +51,8 @@ def register(request):
         users.insert_one({
             "username": username,
             "email": email,
-            "password": password
+            "password": password,
+            "watch_list": [],
         })
 
         return JsonResponse({
