@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 
 const StockComponent = ({ stock_symbol }) => {
   const [stockData, setStockData] = useState({});
+  const [number, setNumber] = useState(10);
 
   useEffect(() => {
     getStockData();
-  });
+  }, [stock_symbol]);
 
   const getStockData = async () => {
     try {
@@ -22,49 +23,68 @@ const StockComponent = ({ stock_symbol }) => {
   const timeSeriesData = stockData["Time Series (5min)"] || {}; // Ensure timeSeriesData is an object
 
   // Extract meta stockData properties with null check
-  const symbol = stockData["Meta Data"] ? stockData["Meta Data"]["2. Symbol"] : "";
+  const symbol = stockData["Meta Data"]
+    ? stockData["Meta Data"]["2. Symbol"]
+    : "";
   const lastRefreshed = stockData["Meta Data"]
     ? stockData["Meta Data"]["3. Last Refreshed"]
     : "";
-  const timeZone = stockData["Meta Data"] ? stockData["Meta Data"]["6. Time Zone"] : "";
+  const timeZone = stockData["Meta Data"]
+    ? stockData["Meta Data"]["6. Time Zone"]
+    : "";
   const information = stockData["Meta Data"]
     ? stockData["Meta Data"]["1. Information"]
     : "";
 
+  const limitedTimeSeriesData = Object.entries(timeSeriesData)
+    .slice(0, number)
+    .reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {});
+
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col">
-        <p>Symbol: {symbol}</p>
-        <p>Last Refreshed: {lastRefreshed}</p>
-        <p>Time Zone: {timeZone}</p>
-        <p>Information: {information}</p>
+    <div className=" mx-auto p-6 bg-white rounded-lg shadow-md">
+      <div className="mb-8">
+        <p className="text-lg font-bold mb-2">Symbol: {symbol}</p>
+        <p className="text-sm">Last Refreshed: {lastRefreshed}</p>
+        <p className="text-sm">Time Zone: {timeZone}</p>
+        <p className="text-sm">Information: {information}</p>
       </div>
       <div>
-        <h2>Time Series (5min)</h2>
-        <table>
+        <h2 className="text-lg font-bold mb-4">Time Series (5min)</h2>
+        <table className="w-full">
           <thead>
             <tr>
-              <th>Timestamp</th>
-              <th>Open</th>
-              <th>High</th>
-              <th>Low</th>
-              <th>Close</th>
-              <th>Volume</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">Timestamp</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">Open</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">High</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">Low</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">Close</th>
+              <th className="py-2 px-4 bg-gray-200 text-gray-700">Volume</th>
             </tr>
           </thead>
           <tbody>
-            {Object.entries(timeSeriesData).map(([timestamp, data]) => (
-              <tr key={timestamp}>
-                <td>{timestamp}</td>
-                <td>{data["1. open"]}</td>
-                <td>{data["2. high"]}</td>
-                <td>{data["3. low"]}</td>
-                <td>{data["4. close"]}</td>
-                <td>{data["5. volume"]}</td>
+            {Object.entries(limitedTimeSeriesData).map(([timestamp, data]) => (
+              <tr key={timestamp} className="border-b border-gray-200">
+                <td className="py-2 px-4">{timestamp}</td>
+                <td className="py-2 px-4">{data["1. open"]}</td>
+                <td className="py-2 px-4">{data["2. high"]}</td>
+                <td className="py-2 px-4">{data["3. low"]}</td>
+                <td className="py-2 px-4">{data["4. close"]}</td>
+                <td className="py-2 px-4">{data["5. volume"]}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        <div className="mt-4">
+          <button
+            onClick={() => setNumber(number + 10)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Load More
+          </button>
+        </div>
       </div>
     </div>
   );
