@@ -12,7 +12,7 @@ uri = "mongodb+srv://divyakrishnanr74:9bJkpwcwsAgEI495@cluster0.6lceo7w.mongodb.
 client = MongoClient(uri)
 
 @csrf_exempt
-def addWatchList(request):
+def addToWatchList(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
         current_user_id = request.GET.get('userid')
@@ -34,6 +34,35 @@ def addWatchList(request):
             
             users.update_one({"_id": ObjectId(current_user_id)}, {"$set": {"watch_list": watch_list}})
             return JsonResponse({"message": "Stock added to watchlist"})
+        
+        return JsonResponse({"error": "User not found"})
+
+
+        
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
+    
+
+@csrf_exempt
+def removeFromWatchList(request):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        current_user_id = request.GET.get('userid')
+        
+        stock_to_remove = data.get('stockToBeRemoved')
+
+        database = client.get_database("user_db")
+        users = database.get_collection("users")
+
+        current_user = users.find_one({"_id" : ObjectId(current_user_id)})
+
+        if current_user:
+            watch_list = current_user.get('watch_list', [])
+            for stock in stock_to_remove:
+                watch_list.remove(stock)
+            
+            users.update_one({"_id": ObjectId(current_user_id)}, {"$set": {"watch_list": watch_list}})
+            return JsonResponse({"message": "Stock removed from watchlist"})
         
         return JsonResponse({"error": "User not found"})
 
@@ -84,3 +113,4 @@ def getStockDetails(request):
     r = requests.get(url)
     
     return JsonResponse(r.json(),safe=False)
+    

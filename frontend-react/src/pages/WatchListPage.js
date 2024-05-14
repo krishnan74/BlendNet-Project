@@ -6,7 +6,23 @@ const WatchListPage = () => {
   const [watchlist, setWatchlist] = useState([]);
   const [exitingWatchList, setExistingWatchList] = useState([]);
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    const userid = localStorage.getItem("userid");
+    fetch(`http://localhost:8000/addToWatchList/?userid=${userid}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        stockToBeAdded: watchlist,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        fetchWatchList();
+      });
+  };
 
   useEffect(() => {
     getStocksList();
@@ -37,7 +53,7 @@ const WatchListPage = () => {
       );
       var data = await response.json();
       data = data.bestMatches;
-    
+
       setSuggestedSymbols(data);
     } catch (err) {
       setSuggestedSymbols([]);
@@ -54,17 +70,49 @@ const WatchListPage = () => {
     setWatchlist([...watchlist, symbol]);
   };
 
+  const handleRemoveStock = async (stock) => {
+    var removeList = [];
+    removeList.push(stock);
+    const userid = localStorage.getItem("userid");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/removeFromWatchList/?userid=${userid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            stockToBeRemoved: removeList,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      fetchWatchList();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className=" mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-3xl font-semibold mb-6">Stock Watchlist</h1>
 
-      <div>
+      <div className="mb-8">
         <h1>Current Watch List</h1>
-        <div className="flex gap-5">
+        <div className="flex gap-5 mt-3">
           {exitingWatchList?.map((stock) => (
-            <div className=" bg-gray-500 px-3 py-2 rounded-md text-white">
+            <div className=" bg-gray-500 pl-4 pr-3 py-1 rounded-md text-white flex items-center justify-between">
               {" "}
-              {stock}{" "}
+              {stock}
+              <button
+                onClick={() => handleRemoveStock(stock)}
+                className="ml-2 w-5 h-5 text-black rounded-full bg-gray-400 flex justify-center
+                items-center"
+              >
+                <p className="text-sm">x</p>
+              </button>
             </div>
           ))}
         </div>
