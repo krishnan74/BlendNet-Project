@@ -52,10 +52,10 @@ def register(request):
 
     try:
         user = users.insert_one({
-            "username": username,
+            "username": username,   
             "email": email,
             "password": password,
-            "watch_list": [],
+            "watch_list": ['IBM', 'MSFT'],
         })
 
         return JsonResponse({

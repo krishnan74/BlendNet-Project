@@ -7,6 +7,10 @@ const StockComponent = ({ stock_symbol }) => {
   const [stockData, setStockData] = useState({});
   const [number, setNumber] = useState(5);
   const [chartDisplay, setChartDisplay] = useState(true);
+  const [open, setOpen] = useState(true);
+  const [high, setHigh] = useState(true);
+  const [low, setLow] = useState(true);
+  const [close, setClose] = useState(true);
 
   useEffect(() => {
     getStockData();
@@ -18,14 +22,14 @@ const StockComponent = ({ stock_symbol }) => {
         `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${stock_symbol}&interval=5min&apikey=demo`
       );
       const data = await response.json();
-      console.log(data);
+
       setStockData(data);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const timeSeriesData = stockData["Time Series (5min)"] || {}; // Ensure timeSeriesData is an object
+  const timeSeriesData = stockData["Time Series (5min)"] || {};
 
   console.log(timeSeriesData);
   const timeStamps = Object.keys(timeSeriesData).slice(0, number).reverse();
@@ -33,7 +37,7 @@ const StockComponent = ({ stock_symbol }) => {
     labels: timeStamps.map((timestamp) => timestamp.slice(-8)),
 
     datasets: [
-      {
+      open && {
         label: "Open",
         data: Object.values(timeSeriesData)
           .slice(0, number)
@@ -42,7 +46,7 @@ const StockComponent = ({ stock_symbol }) => {
         fill: false,
         borderColor: "rgba(75,192,192,1)",
       },
-      {
+      high && {
         label: "High",
 
         data: Object.values(timeSeriesData)
@@ -53,7 +57,7 @@ const StockComponent = ({ stock_symbol }) => {
         fill: false,
         borderColor: "rgba(75,75,192,1)",
       },
-      {
+      low && {
         label: "Low",
         data: Object.values(timeSeriesData)
           .slice(0, number)
@@ -62,7 +66,7 @@ const StockComponent = ({ stock_symbol }) => {
         fill: false,
         borderColor: "rgba(192,75,75,1)",
       },
-      {
+      close && {
         label: "Close",
         data: Object.values(timeSeriesData)
 
@@ -74,7 +78,6 @@ const StockComponent = ({ stock_symbol }) => {
     ],
   };
 
-  // Extract meta stockData properties with null check
   const symbol = stockData["Meta Data"]
     ? stockData["Meta Data"]["2. Symbol"]
     : "";
@@ -141,18 +144,51 @@ const StockComponent = ({ stock_symbol }) => {
                 )}
               </tbody>
             </table>
-            <div className="mt-4 flex gap-10">
-              <button
-                onClick={() => setNumber(number + 5)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Load More
-              </button>
-              <button></button>
-            </div>
           </div>
         </div>
       )}
+      <div className="mt-4 flex gap-10">
+        <button
+          onClick={() => setNumber(number + 5)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Load More
+        </button>
+        <button
+          onClick={() => setChartDisplay(!chartDisplay)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {chartDisplay ? "Show Table" : "Show Chart"}
+        </button>
+
+        <div className="flex gap-3 items-center">
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={() => setOpen(!open)}
+          />
+          <label>Open</label>
+
+          <input
+            type="checkbox"
+            checked={high}
+            onChange={() => setHigh(!high)}
+          />
+
+          <label>High</label>
+
+          <input type="checkbox" checked={low} onChange={() => setLow(!low)} />
+
+          <label>Low</label>
+
+          <input
+            type="checkbox"
+            checked={close}
+            onChange={() => setClose(!close)}
+          />
+          <label>Close</label>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import WatchList from "../components/WatchList";
 
-const Dashboard = () => {
-  const [watchList, setWatchList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+const Dashboard: React.FC = () => {
+  const [watchList, setWatchList] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     fetchWatchList();
@@ -21,8 +21,7 @@ const Dashboard = () => {
         throw new Error("Failed to fetch watchlist");
       }
       const data = await response.json();
-      console.log(data);
-      setWatchList(data.watch_list);
+      setWatchList( data.watch_list);
     } catch (err) {
       setError("Failed to fetch watchlist");
       console.log(err);
@@ -34,14 +33,13 @@ const Dashboard = () => {
   return (
     <div className="px-10">
       <h1 className="text-3xl font-bold mt-8 mb-4">Dashboard</h1>
-      {
-        watchList.length === 0 ? <p>No stocks in watchlist, add stocks to get information</p> :
-        <>
-          <section className="mb-8">
-            <WatchList watchList={watchList} />
-          </section>
-        </>
-      }
+      {watchList.length === 0 ? (
+        <p>No stocks in watchlist, add stocks to get information</p>
+      ) : (
+        <section className="mb-8">
+          <WatchList watchList={watchList} />
+        </section>
+      )}
     </div>
   );
 };
