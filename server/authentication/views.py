@@ -21,9 +21,12 @@ def login(request):
             "username": username,
         })
 
+        userid = str(user['_id'])
+
         if(user['password'] == password):
             return JsonResponse({
-                "message": "Login successful"
+                "message": "Login successful", 
+                "userid": userid
             })
         else:
             return JsonResponse({
@@ -48,7 +51,7 @@ def register(request):
     users = database.get_collection("users")
 
     try:
-        users.insert_one({
+        user = users.insert_one({
             "username": username,
             "email": email,
             "password": password,
@@ -56,7 +59,8 @@ def register(request):
         })
 
         return JsonResponse({
-            "message": "User registered"
+            "message": "User registered",
+            "userid": str(user.inserted_id)
         })
 
     except Exception as e:
