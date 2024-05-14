@@ -70,7 +70,7 @@ def getAllStocks(request):
 
     url = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={}&apikey=demo'.format(keyword)
     r = requests.get(url)
-    response = r.json()['bestMatches']
+    response = r.json()
     
     return JsonResponse(response,safe=False)
 

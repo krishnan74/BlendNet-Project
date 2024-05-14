@@ -35,9 +35,10 @@ const WatchListPage = () => {
       const response = await fetch(
         `http://localhost:8000/getAllStocks?keyword=${symbol}`
       );
-      const data = await response.json();
+      var data = await response.json();
+      data = data.bestMatches;
+    
       setSuggestedSymbols(data);
-      console.log(data);
     } catch (err) {
       setSuggestedSymbols([]);
       console.log(err);
@@ -82,7 +83,7 @@ const WatchListPage = () => {
           />
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {suggestedSymbols.map((s) => (
+          {suggestedSymbols?.map((s) => (
             <button
               key={s["1. symbol"]}
               onClick={() => handleAddToWatchlist(s["1. symbol"])}

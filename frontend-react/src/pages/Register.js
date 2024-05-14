@@ -8,6 +8,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Clicked")
       const formData = new FormData();
       formData.append("username", username);
       formData.append("password", password);
